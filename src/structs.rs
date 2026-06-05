@@ -20,6 +20,10 @@ pub struct CommandArgs {
     /// Specifies which characters should be drawn on the image, by default all characters
     #[arg(short, long, default_value_t = String::new())]
     pub draw_symbols: String,
+
+    /// Shows a symbol in a JSON file
+    #[arg(long, default_value_t = false)]
+    pub show_symbol: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -35,16 +39,32 @@ pub struct Glyph {
 }
 
 impl Glyph {
-    pub fn to_json(&self) -> JsonValue {
-        object! {
-            id: self.id,
-            x: self.x,
-            y: self.y,
-            w: self.w,
-            h: self.h,
-            ox: self.ox,
-            oy: self.oy,
-            advance: self.advance.ceil()
+    pub fn to_json(&self, show_symbol: bool) -> JsonValue {
+        if show_symbol {
+            let symb = char::from_u32(self.id as u32).unwrap().to_string();
+            object! {
+                id: self.id,
+                x: self.x,
+                y: self.y,
+                w: self.w,
+                h: self.h,
+                ox: self.ox,
+                oy: self.oy,
+                advance: self.advance.ceil(),
+                symb: symb
+            }
+        }
+        else {
+            object! {
+                id: self.id,
+                x: self.x,
+                y: self.y,
+                w: self.w,
+                h: self.h,
+                ox: self.ox,
+                oy: self.oy,
+                advance: self.advance.ceil(),
+            }
         }
     }
 }

@@ -30,6 +30,7 @@ fn main() {
 
     let letter_spacing = args.letter_spacing as f32;
     let font_size = args.size as f32;
+    let show_symbol = args.show_symbol;
 
     let mut images = vec![];
     let mut glyphs: Vec<Glyph> = vec![];
@@ -106,7 +107,7 @@ fn main() {
     let mut json_glyphs: json::JsonValue = array![];
 
     for glyph in &glyphs {
-        let _ = json_glyphs.push(glyph.to_json());
+        let _ = json_glyphs.push(glyph.to_json(show_symbol));
     }
 
     let json_result = object! {
