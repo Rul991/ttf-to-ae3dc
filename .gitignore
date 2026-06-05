@@ -1,5 +1,3 @@
 /target
 *.lock
-*.ttf
-*.json
-*.png
+/font/

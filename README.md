@@ -37,7 +37,7 @@ This reads `Roboto.ttf`, rasterises the characters `A`, `B`, `C`, `1`, `2`, `3` 
 
 - **Width** = sum of all rasterised glyph widths + total letter spacing.
 - **Height** = maximum glyph height among the rendered characters.
-- Pixels are stored as **LumaA** (grayscale + alpha). The texture can be used directly for GPU text rendering.
+- Pixels are stored as **RGBA**. The texture can be used directly for GPU text rendering.
 
 ### JSON Metadata
 

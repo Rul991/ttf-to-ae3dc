@@ -1,6 +1,6 @@
 use clap::Parser;
 use fontdue::{Font, FontSettings, Metrics};
-use image::{ImageBuffer, LumaA, imageops::overlay};
+use image::{ImageBuffer, Rgba, imageops::overlay};
 use json::{array, object};
 use std::fs::{read, write};
 
@@ -68,10 +68,10 @@ fn main() {
 
         let mut data = Vec::with_capacity(bitmap.len() * 4);
         for &alpha in &bitmap {
-            data.extend_from_slice(&[255, alpha]);
+            data.extend_from_slice(&[255, 255, 255, alpha]);
         }
 
-        let letter_image = ImageBuffer::<LumaA<u8>, _>::from_raw(width as u32, height as u32, data)
+        let letter_image = ImageBuffer::<Rgba<u8>, _>::from_raw(width as u32, height as u32, data)
             .expect("Failed to create image for letter");
 
         images.push(letter_image);
@@ -91,7 +91,7 @@ fn main() {
     let mut image = ImageBuffer::from_pixel(
         max_width.try_into().unwrap(),
         max_height.try_into().unwrap(),
-        LumaA([0u8; 2]),
+        Rgba([0u8; 4]),
     );
 
     for i in 0..glyphs.len() {
