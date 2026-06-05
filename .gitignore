@@ -1,0 +1,5 @@
+/target
+*.lock
+*.ttf
+*.json
+*.png
