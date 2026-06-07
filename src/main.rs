@@ -63,7 +63,7 @@ fn main() {
             w: width,
             h: height,
             ox: xmin,
-            oy: ymin,
+            oy: font_size as i32 - (height as i32 + ymin),
             advance: advance_width + letter_spacing,
         };
 
