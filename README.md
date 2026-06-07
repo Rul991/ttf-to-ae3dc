@@ -17,6 +17,22 @@ This tool converts a TrueType font (`.ttf`) into a texture atlas (PNG) and a JSO
 ttf-to-ae3dc --name <FONT_NAME> [--size <SIZE>] [--letter-spacing <SPACING>] [--draw-symbols <CHARS>]
 ```
 
+## Building
+
+The project uses Cargo. Make sure you have Rust installed, then:
+
+```bash
+cargo build --release
+```
+
+The executable will be located in `target/release/`.
+
+## Installing from AUR
+
+```bash
+yay -S ttf-to-ae3dc-git
+```
+
 ### Arguments
 
 | Option               | Description                                                                 | Default          |
@@ -67,16 +83,6 @@ This reads `Roboto.ttf`, rasterises the characters `A`, `B`, `C`, `1`, `2`, `3` 
 - `w`, `h` – width and height of the glyph’s bounding box.
 - `ox`, `oy` – offset from the current pen position to where the glyph should be drawn (typically used for kerning and baseline alignment).
 - `advance` – distance (in pixels) to advance the pen after drawing this glyph.
-
-## Building
-
-The project uses Cargo. Make sure you have Rust installed, then:
-
-```bash
-cargo build --release
-```
-
-The executable will be located in `target/release/`.
 
 ## Notes
 
