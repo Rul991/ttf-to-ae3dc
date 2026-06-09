@@ -10,7 +10,6 @@ mod structs;
 
 fn read_font(path: &str) -> Font {
     let font_data = read(path).expect("Failed to read input file");
-
     let font = Font::from_bytes(font_data, FontSettings::default()).expect("Failed to parse font");
 
     font
@@ -34,7 +33,13 @@ fn main() {
 
     let mut images = vec![];
     let mut glyphs: Vec<Glyph> = vec![];
+
     let mut x = 0usize;
+    let mut y = 0usize;
+
+    let mut max_line_height = 0usize;
+    let mut line_height = 0usize;
+    let mut i = 0usize;
 
     let glyph_map = font.chars();
 
@@ -43,6 +48,9 @@ fn main() {
     } else {
         args.draw_symbols.chars().collect()
     };
+
+    let chars_count = chars.len();
+    let chars_per_line = chars_count.isqrt() + 1;
 
     for symbol in chars {
         let (metrics, bitmap) = font.rasterize(symbol, font_size);
@@ -55,16 +63,24 @@ fn main() {
             advance_width,
             ..
         } = metrics;
+        line_height = height.max(line_height);
+
+        let advance = advance_width + letter_spacing;
+        let width = if width != 0 {
+            width
+        } else {
+            advance as usize
+        };
 
         let glyph = Glyph {
             id: symbol as u16,
             x,
-            y: 0,
+            y,
             w: width,
             h: height,
             ox: xmin,
             oy: font_size as i32 - (height as i32 + ymin),
-            advance: advance_width + letter_spacing,
+            advance,
         };
 
         let mut data = Vec::with_capacity(bitmap.len() * 4);
@@ -77,21 +93,49 @@ fn main() {
 
         images.push(letter_image);
         glyphs.push(glyph);
-        x += width;
+
+        i += 1;
+        
+        if (i % chars_per_line) == 0 {
+            x = 0;
+            y += line_height;
+
+            max_line_height = max_line_height.max(line_height);
+            line_height = 0;
+        }
+        else {
+            x += width;
+        }
     }
+    max_line_height = max_line_height.max(line_height);
 
     println!("Glyphs processed: {}", images.len());
 
-    let max_glyph = glyphs
+    let max_bottom = glyphs
         .iter()
-        .max_by(|a, b| a.h.cmp(&b.h))
-        .expect("Failed to get maximum height of glyphs");
+        .max_by(|a, b| {
+            let a_bottom = a.bottom();
+            let b_bottom = b.bottom();
 
-    let max_height = max_glyph.h;
-    let max_width = x;
+            a_bottom.cmp(&b_bottom)
+        })
+        .expect("Failed to get maximum height of glyphs")
+        .bottom();
+
+    let max_right = glyphs
+        .iter()
+        .max_by(|a, b| {
+            let a_right = a.right();
+            let b_right = b.right();
+
+            a_right.cmp(&b_right)
+        })
+        .expect("Failed to get maximum height of glyphs")
+        .right();
+
     let mut image = ImageBuffer::from_pixel(
-        max_width.try_into().unwrap(),
-        max_height.try_into().unwrap(),
+        max_right.try_into().unwrap(),
+        max_bottom.try_into().unwrap(),
         Rgba([0u8; 4]),
     );
 
@@ -102,7 +146,7 @@ fn main() {
         overlay(&mut image, &letter_image, (*x) as i64, (*y) as i64);
     }
 
-    println!("Texture atlas created ({}x{})", max_width, max_height);
+    println!("Texture atlas created ({}x{})", max_right, max_bottom);
 
     let mut json_glyphs: json::JsonValue = array![];
 
@@ -111,7 +155,7 @@ fn main() {
     }
 
     let json_result = object! {
-        lineHeight: max_height,
+        lineHeight: max_line_height,
         glyphs: json_glyphs
     };
 

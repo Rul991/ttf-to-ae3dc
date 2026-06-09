@@ -67,6 +67,14 @@ impl Glyph {
             }
         }
     }
+
+    pub fn bottom(&self) -> usize {
+        self.y + self.h
+    }
+
+    pub fn right(&self) -> usize {
+        self.x + self.w
+    }
 }
 
 pub struct Paths {
